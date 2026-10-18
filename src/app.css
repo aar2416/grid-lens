@@ -1,0 +1,25 @@
+:root{--bg:#0f1419;--panel:#171d25;--line:#2a3340;--fg:#e6edf3;--mut:#8b98a8;--acc:#4da3ff}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif}
+#app{height:100%;display:flex;flex-direction:column}
+select,button{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit}
+button{cursor:pointer}button:hover{border-color:var(--acc)}
+h2{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+svg text{fill:var(--mut);font-size:11px}
+
+/* Page layouts shared by all pages.
+   .page = content on the left, map on the right.  .page.map-left flips it (Study page). */
+.page { flex: 1; display: grid; grid-template-columns: 1fr 460px; min-height: 0; }
+.page.map-left { grid-template-columns: 1fr 420px; }
+.page > .content { overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.page > .content + .map-slot { border-left: 1px solid var(--line); }
+.map-slot { position: relative; min-height: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; flex-shrink: 0; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; color: var(--mut); font-weight: 500; font-size: 12px; padding: 6px 8px; }
+td { padding: 6px 8px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover, tr.selected { background: #ffffff0d; }
+.pill { display: inline-block; min-width: 44px; text-align: center; padding: 1px 6px; border-radius: 10px; color: #fff; font-size: 12px; }
+@media (max-width: 900px) { .page, .page.map-left { grid-template-columns: 1fr; grid-template-rows: auto 50vh; } }
