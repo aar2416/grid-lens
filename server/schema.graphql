@@ -1,0 +1,28 @@
+type Scenario { id: ID!, label: String!, short: String! }
+type Bus { id: ID!, name: String!, lng: Float!, lat: Float! }
+
+type Line {
+  id: ID!
+  name: String!
+  from: ID!
+  to: ID!
+  coords: [[Float!]!]!
+  "Loading % of rating, one value per scenario (same order as 'scenarios')"
+  loading: [Float!]!
+}
+
+type Upgrade { id: ID!, lineId: ID!, description: String!, costM: Float!, defaultOn: Boolean! }
+type Project { id: ID!, name: String!, busId: ID!, upgrades: [Upgrade!]! }
+
+type StudyRun { id: ID!, projectId: ID! }
+type StudyProgress { runId: ID!, percent: Int!, stage: String!, done: Boolean! }
+
+type Query {
+  scenarios: [Scenario!]!
+  buses: [Bus!]!
+  lines: [Line!]!
+  projects: [Project!]!
+}
+
+type Mutation { runStudy(projectId: ID!): StudyRun! }
+type Subscription { studyProgress(runId: ID!): StudyProgress! }

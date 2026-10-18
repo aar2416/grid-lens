@@ -3,7 +3,7 @@
   Tick/untick to include or exclude an upgrade; click a row to highlight its line.
 -->
 <script lang="ts">
-  import { LINE_BY_ID } from "../lib/data";
+  import { lineById } from "../lib/study";
   import { selectedLineId, setUpgrade, toggleLine, totalCostM, upgrades } from "../lib/stores";
 </script>
 
@@ -18,7 +18,7 @@
       />
       <div class="desc">
         {u.description}
-        <small>{u.lineId} · {LINE_BY_ID[u.lineId].name}</small>
+        <small>{u.lineId} · {$lineById[u.lineId].name}</small>
       </div>
       <div class="cost">${u.costM.toFixed(1)}M</div>
     </li>

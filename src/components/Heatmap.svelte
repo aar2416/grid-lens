@@ -3,13 +3,13 @@
   Shows where problems cluster. Click a cell to jump to that line + scenario.
 -->
 <script lang="ts">
-  import { LINES, SCENARIOS } from "../lib/data";
+  import { lines, scenarios } from "../lib/study";
   import { loadColor } from "../lib/color";
   import { scenarioIdx, selectedLineId, toggleLine } from "../lib/stores";
 
   const cellW = 80, cellH = 17, labelW = 40, headerH = 36;
-  const width = labelW + cellW * SCENARIOS.length;
-  const height = headerH + cellH * LINES.length + 4;
+  $: width = labelW + cellW * $scenarios.length;
+  $: height = headerH + cellH * $lines.length + 4;
 
   function pickCell(lineId: string, scenarioIndex: number) {
     $scenarioIdx = scenarioIndex;
@@ -19,7 +19,7 @@
 
 <svg viewBox="0 0 {width} {height}" width="100%">
   <!-- column headers: click to switch scenario -->
-  {#each SCENARIOS as s, col}
+  {#each $scenarios as s, col}
     <text
       x={labelW + col * cellW + cellW / 2} y={headerH - 6} text-anchor="middle"
       class="clickable" font-weight={col === $scenarioIdx ? 700 : 400}
@@ -27,7 +27,7 @@
     >{s.short}</text>
   {/each}
 
-  {#each LINES as line, row}
+  {#each $lines as line, row}
     {@const rowY = headerH + row * cellH}
     <!-- row label: click to select the line -->
     <text

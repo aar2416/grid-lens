@@ -23,7 +23,8 @@ Browser (Svelte + TS)  ──/graphql──►  Vite proxy  ──►  GraphQL s
 
 ### Backend (`server/`)
 - `data.ts` – buses, lines, scenarios, projects (made-up data).
-- `index.ts` – GraphQL schema and resolvers:
+- `schema.graphql` – the GraphQL schema. `schema.ts` – resolvers (`makeSchema()`, used by the server and the tests). `index.ts` – starts the HTTP server.
+- Behaviour:
   - **Queries** return the data.
   - **Mutation** `runStudy(projectId)` returns a run id (no real job runs).
   - **Subscription** `studyProgress(runId)` streams progress over Server-Sent Events, using an async generator.
@@ -31,9 +32,11 @@ Browser (Svelte + TS)  ──/graphql──►  Vite proxy  ──►  GraphQL s
 ### Frontend (`src/`)
 | File | Role |
 |---|---|
-| `main.ts` | Loads data, then dynamically imports and mounts the app |
+| `main.ts` | Mounts the app and starts loading the data |
 | `lib/gql.ts` | Tiny GraphQL client: `fetch` for query/mutation, `EventSource` for subscription |
-| `lib/data.ts` | One `Study` query at startup fills `LINES`, `PROJECTS`, etc. |
+| `lib/study.ts` | The data in a store with a `loading` / `error` / `ready` status, plus derived slices (`lines`, `projects`, `lineById`, …) |
+| `graphql/*.graphql` | The queries, mutation and subscription as real `.graphql` files |
+| `lib/generated/graphql.ts` | Types generated from the schema and the `.graphql` files (`npm run codegen`) |
 | `lib/stores.ts` | App state as Svelte stores (the Redux equivalent) |
 | `lib/router.ts` | ~25-line hash router (`#/study`, `#/lines`, …) |
 | `lib/color.ts` | D3 colour scale: green → amber → red by loading % |
@@ -60,7 +63,7 @@ Browser (Svelte + TS)  ──/graphql──►  Vite proxy  ──►  GraphQL s
 
 ## Key data flows
 
-**Startup:** `main.ts` → `loadData()` (one GraphQL query) → dynamic import of `App.svelte` (because `stores.ts` reads the data when evaluated).
+**Startup:** `main.ts` mounts the app → `loadStudy()` sends one GraphQL query → `study` store goes `loading` → `ready` (or `error`, with a Retry button). `App.svelte` shows the matching screen, so nothing depends on import order.
 
 **Click a line:** bar / map / heatmap cell / table row / upgrade row → `toggleLine(id)` → `selectedLineId` changes → map halo + zoom, bar and cell outlines, upgrade row highlight. No server call.
 
@@ -71,7 +74,7 @@ Browser (Svelte + TS)  ──/graphql──►  Vite proxy  ──►  GraphQL s
 ## What is fake / limitations
 - Data is hard-coded on the server.
 - `runStudy` runs no real job; the server just counts to 100.
-- No tests, no authentication.
+- Tests cover the stores, colour scale and API only: no component or end-to-end tests. No authentication.
 - The map reloads on each page switch (it is created per page).
 - Accessibility is partial (a11y warning on clickable `<li>` rows).
 - No error state if the Mapbox style fails to load.

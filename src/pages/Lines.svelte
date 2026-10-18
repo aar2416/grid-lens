@@ -5,11 +5,11 @@
 <script lang="ts">
   import GridMap from "../components/GridMap.svelte";
   import { loadColor } from "../lib/color";
-  import { LINES, SCENARIOS } from "../lib/data";
+  import { lines, scenarios } from "../lib/study";
   import { scenarioIdx, selectedLineId, toggleLine } from "../lib/stores";
 
   let sortBy = -1; // -1 = by line id, otherwise a scenario index
-  $: rows = sortBy < 0 ? LINES : [...LINES].sort((a, b) => b.loading[sortBy] - a.loading[sortBy]);
+  $: rows = sortBy < 0 ? $lines : [...$lines].sort((a, b) => b.loading[sortBy] - a.loading[sortBy]);
 </script>
 
 <div class="page">
@@ -21,7 +21,7 @@
           <tr>
             <th><button class="th" on:click={() => (sortBy = -1)}>Line</button></th>
             <th>Route</th>
-            {#each SCENARIOS as s, i}
+            {#each $scenarios as s, i}
               <th><button class="th" class:active={sortBy === i} on:click={() => (sortBy = i)}>{s.short} {sortBy === i ? "↓" : ""}</button></th>
             {/each}
           </tr>

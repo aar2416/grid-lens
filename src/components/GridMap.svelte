@@ -9,7 +9,7 @@
   import { onDestroy, onMount } from "svelte";
   import mapboxgl from "mapbox-gl";
   import "mapbox-gl/dist/mapbox-gl.css";
-  import { BUSES, LINE_BY_ID } from "../lib/data";
+  import { buses, lineById } from "../lib/study";
   import { loadColor } from "../lib/color";
   import { loadings, project, selectedLineId, toggleLine } from "../lib/stores";
 
@@ -91,7 +91,8 @@
   $: if (ready) {
     map!.setFilter("selected", ["==", ["get", "id"], $selectedLineId ?? ""]);
     if ($selectedLineId) {
-      const [a, b] = LINE_BY_ID[$selectedLineId].coords;
+      // coords come from GraphQL as number[][]; each point is [lng, lat]
+      const [a, b] = $lineById[$selectedLineId].coords as [number, number][];
       map!.fitBounds([a, b], { padding: 160, maxZoom: 9, duration: 600 });
     }
   }
@@ -100,7 +101,7 @@
   $: if (ready) placeProjectMarker($project);
 
   function placeProjectMarker(p: typeof $project) {
-    const bus = BUSES[p.busId];
+    const bus = $buses[p.busId];
     marker?.remove();
     marker = new mapboxgl.Marker({ color: "#58a6ff" })
       .setLngLat([bus.lng, bus.lat])

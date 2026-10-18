@@ -1,0 +1,11 @@
+# Generates TypeScript types from the schema and from the queries in src/graphql/.
+# Run with: npm run codegen   (re-run after changing the schema or any .graphql file)
+schema: server/schema.graphql
+documents: src/graphql/*.graphql
+generates:
+  src/lib/generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    config:
+      avoidOptionals: true

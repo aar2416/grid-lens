@@ -4,12 +4,13 @@
 -->
 <script lang="ts">
   import GridMap from "../components/GridMap.svelte";
-  import { BUSES, PROJECTS } from "../lib/data";
+  import { buses, projects } from "../lib/study";
   import { navigate } from "../lib/router";
-  import { projectId, selectedLineId, upgradeOverrides } from "../lib/stores";
+  import type { Project } from "../lib/types";
+  import { project, projectId, selectedLineId, upgradeOverrides } from "../lib/stores";
 
   /** Cost of a project's ticked upgrades (respects the user's checkbox choices). */
-  const cost = (p: (typeof PROJECTS)[number], overrides: Record<string, boolean>) =>
+  const cost = (p: Project, overrides: Record<string, boolean>) =>
     p.upgrades.filter((u) => overrides[u.id] ?? u.defaultOn).reduce((s, u) => s + u.costM, 0);
 
   function choose(id: string) {
@@ -21,12 +22,12 @@
 <div class="page">
   <div class="content">
     <h1>Proposed projects</h1>
-    {#each PROJECTS as p (p.id)}
-      <div class="card project" class:current={p.id === $projectId}
+    {#each $projects as p (p.id)}
+      <div class="card project" class:current={p.id === $project.id}
            on:click={() => choose(p.id)} on:keydown={(e) => e.key === "Enter" && choose(p.id)} role="button" tabindex="0">
         <div>
           <h3>{p.name}</h3>
-          <p>Connects at {BUSES[p.busId].name} · {p.upgrades.length} upgrades · ${cost(p, $upgradeOverrides).toFixed(1)}M</p>
+          <p>Connects at {$buses[p.busId].name} · {p.upgrades.length} upgrades · ${cost(p, $upgradeOverrides).toFixed(1)}M</p>
         </div>
         <button on:click|stopPropagation={() => { choose(p.id); navigate("/study"); }}>Open study</button>
       </div>

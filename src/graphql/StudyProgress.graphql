@@ -1,0 +1,3 @@
+subscription StudyProgress($runId: ID!) {
+  studyProgress(runId: $runId) { percent stage done }
+}

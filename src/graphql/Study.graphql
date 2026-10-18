@@ -1,0 +1,6 @@
+query Study {
+  scenarios { id label short }
+  buses { id name lng lat }
+  lines { id name from to coords loading }
+  projects { id name busId upgrades { id lineId description costM defaultOn } }
+}

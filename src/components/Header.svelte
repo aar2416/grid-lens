@@ -3,21 +3,17 @@
   "Run study" = GraphQL mutation (start a run) + subscription (stream progress).
 -->
 <script lang="ts">
-  import { PROJECTS, SCENARIOS } from "../lib/data";
+  import runStudyMutation from "../graphql/RunStudy.graphql?raw";
+  import studyProgressSubscription from "../graphql/StudyProgress.graphql?raw";
+  import type { RunStudyMutation, StudyProgressSubscription } from "../lib/generated/graphql";
   import { gql, subscribe } from "../lib/gql";
   import { PAGES, route } from "../lib/router";
-  import { projectId, scenarioIdx, selectedLineId } from "../lib/stores";
+  import { projects, scenarios } from "../lib/study";
+  import { project, projectId, scenarioIdx, selectedLineId } from "../lib/stores";
 
   let running = false;
   let progress = 0; // 0..100
   let status = "";
-
-  const RUN_STUDY = /* GraphQL */ `
-    mutation ($projectId: ID!) { runStudy(projectId: $projectId) { id } }
-  `;
-  const STUDY_PROGRESS = /* GraphQL */ `
-    subscription ($runId: ID!) { studyProgress(runId: $runId) { percent stage done } }
-  `;
 
   async function runStudy() {
     running = true;
@@ -25,10 +21,10 @@
     status = "Starting…";
     try {
       // 1. Mutation: ask the server to start a run; it returns a run id.
-      const { runStudy } = await gql<{ runStudy: { id: string } }>(RUN_STUDY, { projectId: $projectId });
+      const { runStudy } = await gql<RunStudyMutation>(runStudyMutation, { projectId: $project.id });
       // 2. Subscription: the server pushes progress events for that run until it is done.
-      subscribe<{ studyProgress: { percent: number; stage: string; done: boolean } }>(
-        STUDY_PROGRESS,
+      subscribe<StudyProgressSubscription>(
+        studyProgressSubscription,
         { runId: runStudy.id },
         ({ studyProgress: p }) => {
           progress = p.percent;
@@ -57,13 +53,13 @@
 
   <label>
     Project
-    <select value={$projectId} on:change={pickProject}>
-      {#each PROJECTS as p}<option value={p.id}>{p.name}</option>{/each}
+    <select value={$project.id} on:change={pickProject}>
+      {#each $projects as p}<option value={p.id}>{p.name}</option>{/each}
     </select>
   </label>
 
   <div class="seg">
-    {#each SCENARIOS as s, i}
+    {#each $scenarios as s, i}
       <button class:on={$scenarioIdx === i} on:click={() => ($scenarioIdx = i)}>{s.label}</button>
     {/each}
   </div>

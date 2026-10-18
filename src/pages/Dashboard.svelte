@@ -5,7 +5,7 @@
 <script lang="ts">
   import GridMap from "../components/GridMap.svelte";
   import { loadColor } from "../lib/color";
-  import { BUSES } from "../lib/data";
+  import { buses } from "../lib/study";
   import { navigate } from "../lib/router";
   import {
     isOverloaded, kpis, overloadsByScenario, project, scenario, scenarioIdx,
@@ -13,12 +13,12 @@
   } from "../lib/stores";
 
   $: worstFive = $topLines.slice(0, 5);
-  $: maxOverloads = Math.max(...overloadsByScenario.map((o) => o.count), 1);
+  $: maxOverloads = Math.max(...$overloadsByScenario.map((o) => o.count), 1);
 </script>
 
 <div class="page">
   <div class="content">
-    <h1>{$project.name} <small>connects at {BUSES[$project.busId].name} · {$scenario.label}</small></h1>
+    <h1>{$project.name} <small>connects at {$buses[$project.busId].name} · {$scenario.label}</small></h1>
 
     <!-- 1. Headline numbers -->
     <div class="kpis">
@@ -43,7 +43,7 @@
     <!-- 2. Overloads per scenario: click a bar to switch scenario -->
     <section class="card">
       <h2>Overloaded lines by scenario</h2>
-      {#each overloadsByScenario as o}
+      {#each $overloadsByScenario as o}
         <button class="scen" class:on={o.index === $scenarioIdx} on:click={() => ($scenarioIdx = o.index)}>
           <span class="name">{o.scenario.label}</span>
           <span class="track"><span class="fill" style="width:{(o.count / maxOverloads) * 100}%"></span></span>
